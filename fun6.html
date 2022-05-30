@@ -1,263 +1,747 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tornado 🌪</title>
-    </head>
-    <body>
-        <div class="container"></div>
 
-        <script type="x-shader/x-fragment" id="fragmentShader">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-        varying float vStripes;
-        varying float vOpacity;
+  
+   <title>Birds 🐦</title>
+  
+  <link rel="stylesheet" href="./birds_files/normalize.min.css">
 
-        void main() {
-            gl_FragColor = vec4(vec3(vStripes * 15.), vOpacity);
-        }
-
-        </script>
-
-        <script type="x-shader/x-vertex" id="vertexShader">
-
-        #define PI 3.14159265359
-
-        uniform float u_time;
-        uniform float u_height;
-        uniform float u_density;
-        uniform float u_curl;
-        uniform vec2 u_wind;
-        uniform float u_mouse_delta;
-
-        varying float vStripes;
-        varying float vOpacity;
-
-        vec2 random2(vec2 p) {
-            return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
-        }
-
-        float voronoi(vec2 _uv, float time){
-            vec2 i_uv = floor(_uv);
-            vec2 f_uv = fract(_uv);
-            float min_dist = 2.;
-            for (int j = -1; j <= 1; j++) {
-            for (int i = -1; i <= 1; i++) {
-                vec2 tile_offset = vec2(float(i), float(j));
-                vec2 cell_center = .5 + .5 * sin(time * .5 + PI * 2. * random2(i_uv + tile_offset));
-                float dist = length(tile_offset + cell_center - f_uv);
-                min_dist = min(min_dist, dist);
-            }
-            }
-            return pow(min_dist, 2.);
-        }
-
-        mat2 rotate2d(float angle) {
-            return mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-        }
-
-        float cubic_pulse_shape(float center, float width, float x) {
-            x = abs(x - center);
-            if (x > width) return 0.;
-            x /= width;
-            return 1. - x * x * (3. - 2. * x);
-        }
-
-        float cone_shape(float x) {
-            return .5 * cos(x * 3.1 + 2.6) + .5 + exp(-12. * x);
-        }
-
-        void main() {
-            vec3 pos = position;
-            float y_factor = uv.x;
-
-            // Less visibile on right and back
-            float vertical_transparency = pow(3. * y_factor * (1. - y_factor), 2.5);
-            float back_transparency = pow(pos.x + 1., 2.) * pow(pos.z + 1., 2.);
-            vOpacity = vertical_transparency * back_transparency;
-
-            // Spiral stuuf over the cyllinder
-            vec2 voronoi_point = vec2(atan(pos.x, pos.z) - pos.y * u_curl, pos.y - u_time);
-            float bumps = voronoi(u_density * voronoi_point, u_time);
-            vec3 pos_no_bump = pos;
-            pos -= (normal * .2 * bumps);
-            vStripes = length(pos_no_bump - pos);
-
-            // Shaping the cyllinder
-            float cone = cone_shape(y_factor);
-            pos.x *= cone;
-            pos.z *= cone;
-            pos.y *= u_height;
-
-            // Add slight constant rotation for central part
-            vec2 wind = vec2(.04, 0.);
-            wind = rotate2d(u_time * 2.) * wind;
-            pos += (vec3(wind.x, 0., wind.y) * (1. - cone));
-
-            // Make the central part to follow the mouse
-            wind += u_wind;
-            pos += vec3(wind.x, 0., wind.y) * cubic_pulse_shape(.35, .8, y_factor);
-
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.);
-        }
-        </script>
-        <script>
-            import * as THREE from "https://cdn.skypack.dev/three@0.133.1/build/three.module";
-import { GUI } from "https://cdn.skypack.dev/lil-gui@0.16.1";
-
-const container = document.querySelector('.container');
-
-const config = {
-    height: 1.1,
-    density: 2.5,
-    curl: 12,
-};
-
-class Controls {
-    constructor() {
-        const gui = new GUI();
-        if (window.innerWidth < 600) gui.close();
-
-        gui.add(config, 'height', 1, 1.8).step(.01).onChange(v => {
-            viz.material.uniforms.u_height.value = v;
-        });
-        gui.add(config, 'density', 1, 4).step(.1).onChange(v => {
-            viz.material.uniforms.u_density.value = v;
-        });
-        gui.add(config, 'curl', 4, 20).step(.1).onChange(v => {
-            viz.material.uniforms.u_curl.value = v;
-        });
-    }
+  
+  
+<style>
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  overflow: hidden;
 }
 
-class Viz {
-
-    constructor() {
-        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      
-        container.appendChild(this.renderer.domElement);
-
-        this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-        this.camera.position.z = 2.9;
-        this.camera.position.y = 1.1;
-        this.camera.lookAt(0, 0, 0);
-
-        this.rotationY = -.4 * Math.PI;
-
-        this.raycaster = new THREE.Raycaster();
-
-        this.mouse = new THREE.Vector2(0, 0);
-        this.mouseTarget = new THREE.Vector2(0, 0);
-
-        this.clock = new THREE.Clock();
-
-        this.setupScene();
-        this.render();
-    }
-
-    setupScene() {
-
-        const planeMaterial = new THREE.MeshBasicMaterial({
-            color: 0xffffff
-        });
-        const planeGeometry = new THREE.PlaneGeometry(2000, 1000);
-        this.floor = new THREE.Mesh(planeGeometry, planeMaterial);
-        this.floor.position.set(0, -2, 0);
-        this.floor.rotation.set(-.2 * Math.PI, 0, 0);
-        this.scene.add(this.floor);
-
-        this.material = new THREE.ShaderMaterial({
-            uniforms: {
-                u_time: { type: 'f', value: 0 },
-                u_height: { type: 'f', value: config.height },
-                u_density: { type: 'f', value: config.density },
-                u_curl: { type: 'f', value: config.curl },
-                u_wind: { type: 'v2', value: new THREE.Vector2(0, 0) },
-            },
-            vertexShader: document.getElementById("vertexShader").textContent,
-            fragmentShader: document.getElementById("fragmentShader").textContent,
-            side: THREE.DoubleSide,
-            transparent: true
-        });
-        const curve = new THREE.LineCurve3(
-            new THREE.Vector3(0, 0, 0),
-            new THREE.Vector3(0, 1, 0),
-        );
-        const geometry = new THREE.TubeGeometry(curve, 512, .55, 512, false);
-        this.mesh = new THREE.Mesh(geometry, this.material);
-        this.mesh.position.set(0, -.65, 0);
-        this.mesh.rotation.set(0, this.rotationY, 0);
-        this.scene.add(this.mesh);
-    }
-
-
-    addCanvasEvents() {
-        container.addEventListener('mousemove', (e) => {
-            updateMousePosition(e.clientX, e.clientY, this);
-        });
-        container.addEventListener('touchmove', (e) => {
-            updateMousePosition(e.touches[0].pageX, e.touches[0].pageY, this);
-        });
-		
-
-        function updateMousePosition(eX, eY, viz) {
-            const x = eX - container.offsetLeft;
-            const y = eY - container.offsetTop;
-            viz.mouseTarget.x = x / container.offsetWidth * 2 - 1;
-            viz.mouseTarget.y = -(y / container.offsetHeight) * 2 + 1;
-        }
-    }
-
-    render() {
-        this.material.uniforms.u_time.value = 1.3 * this.clock.getElapsedTime();
-
-        this.mouse.x += (this.mouseTarget.x - this.mouse.x) * .1;
-        this.mouse.y += (this.mouseTarget.y - this.mouse.y) * .1;
-
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-        const intersects = this.raycaster.intersectObject(this.floor);
-        if (intersects.length) {
-            this.material.uniforms.u_wind.value = new THREE.Vector2(intersects[0].uv.x - .5, .5 - intersects[0].uv.y)
-                .rotateAround(new THREE.Vector2(0, 0), this.rotationY)
-                .multiplyScalar(200);
-        }
-
-        this.renderer.render(this.scene, this.camera);
-    }
-
-    loop() {
-        this.render();
-        requestAnimationFrame(this.loop.bind(this));
-    }
-
-    updateSize() {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    }
-}
-
-
-const controls = new Controls();
-const viz = new Viz();
-viz.addCanvasEvents();
-viz.updateSize();
-viz.loop();
-
-window.addEventListener('resize', () => viz.updateSize());
-        </script>
-        <style>
-            body {
-    overflow: hidden;
-    padding: 0;
-    margin: 0;
-}
 canvas {
-    display: block;
+  z-index: 99;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(#B7B0E3, #FFD3D6);
 }
-        </style>
-    </body>
-</html>
+
+@-webkit-keyframes anim {
+  from {
+    transform: translateX(200%);
+  }
+  to {
+    transform: translateX(-200%);
+  }
+}
+
+@keyframes anim {
+  from {
+    transform: translateX(200%);
+  }
+  to {
+    transform: translateX(-200%);
+  }
+}
+@-webkit-keyframes anime {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-200%);
+  }
+}
+@keyframes anime {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-200%);
+  }
+}
+.c1, .c2 {
+  width: 800px;
+  height: 700px;
+  position: absolute;
+  background: transparent url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/131045/clouds.png") 0 0 no-repeat;
+  background-size: 100%;
+  z-index: 999;
+}
+
+.c1.one, .c2.one {
+  top: -260px;
+  left: 0px;
+}
+
+.c1.two, .c2.two {
+  top: -200px;
+  left: 100px;
+}
+
+.c1.three, .c2.three {
+  top: -240px;
+  right: 100px;
+}
+
+.c1.four, .c22.four {
+  top: -180px;
+  right: 0px;
+}
+
+.c2 .one {
+  top: -209px;
+}
+
+@media (max-width: 1023px) {
+  .c2.one {
+    left: -80px;
+  }
+
+  .c2.two {
+    left: -120px;
+  }
+
+  .c2.three {
+    right: 220px;
+  }
+
+  .c2.four {
+    right: 220px;
+  }
+}
+.c1 {
+  -webkit-animation: anime 1000s linear infinite forwards;
+          animation: anime 1000s linear infinite forwards;
+}
+
+.c2 {
+  transform: translateX(200%);
+  -webkit-animation: anim 1000s linear infinite forwards;
+          animation: anim 1000s linear infinite forwards;
+}
+</style>
+
+  
+  
+  
+  
+
+</head>
+
+<body translate="no">
+  <canvas id="canv" width="1457" height="852"></canvas>
+ <div class="sky">
+  <div class="clouds">
+    <div class="c1 one"></div>
+    <div class="c1 two"></div>
+    <div class="c1 three"></div>
+    <div class="c1 four"></div>
+    <div class="c2 one"></div>
+    <div class="c2 two"></div>
+    <div class="c2 three"></div>
+    <div class="c2 four"></div>
+  </div>
+</div>
+  
+  
+      <script id="rendered-js">
+var Bird = {
+  def: function(n, m, s) {
+    if (m) this.e(n.prototype, m);
+    if (s) this.e(n, s);
+    return n;
+  },
+  e: function(o, p) {
+    for (prop in p) o[prop] = p[prop];
+    return o;
+  },
+  v: [
+    [5, 0, 0],
+    [-5, -2, 1],
+    [-5, 0, 0],
+    [-5, -2, -1],
+    [0, 2, -6],
+    [0, 2, 6],
+    [2, 0, 0],
+    [-3, 0, 0]
+  ],
+  beak: [
+    [0, 1, 2],
+    [4, 7, 6],
+    [5, 6, 7]
+  ],
+  L: null,
+  V: {
+    x: 0,
+    y: 0,
+    z: 5000
+  }
+}
+Bird.obj = Bird.def(
+  function() {
+    this.vtr = new Bird.Vtr(),
+      this.accel, this.width = 600, this.height = 600, this.depth = 300, this.ept, this.area = 200,
+      this.msp = 4, this.mfrc = 0.1, this.coll = false;
+    this.pos = new Bird.Vtr();
+    this.vel = new Bird.Vtr();
+    this.accel = new Bird.Vtr();
+  }, {
+
+    _coll: function(value) {
+      this.coll = value;
+    },
+    param: function(w, h, dth) {
+      this.width = w;
+      this.height = h;
+      this.depth = dth;
+    },
+    run: function(b) {
+      if (this.coll) {
+        this.vtr.set(-this.width, this.pos.y, this.pos.z);
+        this.vtr = this.detect(this.vtr);
+        this.vtr.scale(5);
+        this.accel.add(this.vtr);
+        this.vtr.set(this.width, this.pos.y, this.pos.z);
+        this.vtr = this.detect(this.vtr);
+        this.vtr.scale(5);
+        this.accel.add(this.vtr);
+        this.vtr.set(this.pos.x, -this.height, this.pos.z);
+        this.vtr = this.detect(this.vtr);
+        this.vtr.scale(5);
+        this.accel.add(this.vtr);
+        this.vtr.set(this.pos.x, this.height, this.pos.z);
+        this.vtr = this.detect(this.vtr);
+        this.vtr.scale(5);
+        this.accel.add(this.vtr);
+        this.vtr.set(this.pos.x, this.pos.y, -this.depth);
+        this.vtr = this.detect(this.vtr);
+        this.vtr.scale(5);
+        this.accel.add(this.vtr);
+        this.vtr.set(this.pos.x, this.pos.y, this.depth);
+        this.vtr = this.detect(this.vtr);
+        this.vtr.scale(5);
+        this.accel.add(this.vtr);
+      }
+      if (Math.random() > 0.5) {
+        this.fly(b);
+      }
+      this.move();
+    },
+    fly: function(b) {
+      if (this.ept) {
+        this.accel.add(this.meet(this.ept, 0.005));
+      }
+      this.accel.add(this.line(b));
+      this.accel.add(this.togeth(b));
+      this.accel.add(this.apart(b));
+    },
+    move: function() {
+      this.vel.add(this.accel);
+      var l = this.vel.len();
+      if (l > this.msp) {
+        this.vel.lowscale(l / this.msp);
+      }
+      this.pos.add(this.vel);
+      this.accel.set(0, 0, 0);
+    },
+    detect: function(pt) {
+      var dir = new Bird.Vtr();
+      dir.copy(this.pos);
+      dir.sub(pt);
+      dir.scale(1 / this.pos.dsq(pt));
+      return dir;
+    },
+    rep: function(pt) {
+      var dist = this.pos.dst(pt);if (dist < 150) {
+        var dir = new Bird.Vtr();
+        dir.subv(this.pos, pt);
+        dir.scale(0.5 / dist);
+        this.accel.add(dir);
+      }
+    },
+    meet: function(pt, amt) {
+      var dir = new Bird.Vtr();
+      dir.subv(pt, this.pos);
+      dir.scale(amt);
+      return dir;
+    },
+    line: function(b) {
+      var _b, totvel = new Bird.Vtr(),
+        cnt = 0;
+      for (var i = 0, il = b.length; i < il; i++) {
+        if (Math.random() > 0.6) continue;
+        _b = b[i];
+        var dist = _b.pos.dst(this.pos);
+        if (dist > 0 && dist <= this.area) {
+          totvel.add(_b.vel);
+          cnt++;
+        }
+      }
+      if (cnt > 0) {
+        totvel.lowscale(cnt);
+        var v = totvel.len();
+        if (v > this.mfrc) {
+          totvel.lowscale( v / this.mfrc);
+        }
+      }
+      return totvel;
+    },
+    togeth: function(b) {
+      var _b, dist,
+        plus = new Bird.Vtr(),
+        dir = new Bird.Vtr(),
+        cnt = 0;
+      for (var i = 0, il = b.length; i < il; i++) {
+        if (Math.random() > 0.6) continue;
+        _b = b[i];
+        dist = _b.pos.dst(this.pos);
+        if (dist > 0 && dist <= this.area) {
+          plus.add(_b.pos);
+          cnt++;
+        }
+      }
+      if (cnt > 0) {
+        plus.lowscale(cnt);
+      }
+      dir.subv(plus, this.pos);
+      var l = dir.len();
+      if (l > this.mfrc) {
+        dir.lowscale(l / this.mfrc);
+      }
+      return dir;
+    },
+    apart: function(b) {
+      var _b, dist,
+        plus = new Bird.Vtr(),
+        rep = new Bird.Vtr();
+      for (var i = 0, il = b.length; i < il; i++) {
+        if (Math.random() > 0.6) continue;
+        _b = b[i];
+        dist = _b.pos.dst(this.pos);
+        if (dist > 0 && dist <= this.area) {
+          rep.subv(this.pos, _b.pos);
+          rep.level();
+          rep.lowscale(dist);
+          plus.add(rep);
+        }
+      }
+      return plus;
+    }
+  }
+);
+Bird.Build = Bird.def(
+  function() {
+    this.base = 0, this.left = 1, this.right = 2;
+    this.pos = new Bird.Vtr();
+    this.rot = new Bird.Vtr();
+    this.bbase = this.tri(this.base);
+    this.leftwing = this.tri(this.left);
+    this.rightwing = this.tri(this.right);
+  }, {
+    matrix: function() {
+      this.bbase.vtx();
+      this.leftwing.vtx();
+      this.rightwing.vtx();
+      this.leftwing.wingY(this.wY);
+      this.rightwing.wingY(this.wY);
+      this.bbase.rotY(this.rot.y);
+      this.bbase.rotZ(this.rot.z);
+      this.leftwing.rotY(this.rot.y);
+      this.leftwing.rotZ(this.rot.z);
+      this.rightwing.rotY(this.rot.y);
+      this.rightwing.rotZ(this.rot.z);
+      this.bbase.trans(this.pos);
+      this.leftwing.trans(this.pos);
+      this.rightwing.trans(this.pos);
+    },
+    draw: function() {
+      this.bbase.draw();
+      this.leftwing.draw();
+      this.rightwing.draw();
+    },
+    tri: function(i) {
+      var v1, v2, v3, v;
+      v = Bird.v[Bird.beak[i][0]];
+      v1 = new Bird.Vtr(v[0], v[1], v[2]);
+      v = Bird.v[Bird.beak[i][1]];
+      v2 = new Bird.Vtr(v[0], v[1], v[2]);
+      v = Bird.v[Bird.beak[i][2]];
+      v3 = new Bird.Vtr(v[0], v[1], v[2]);
+      return new Bird.Tri(v1, v2, v3);
+    },
+    wang: function(y) {
+      var v1 = Bird.v[Bird.beak[1][1]];
+      this.rot.x = Math.atan2(y, v1[0]);
+    },
+    zpos: function() {
+      var z1 = this.bbase._z();
+      var z2 = this.leftwing._z();
+      var z3 = this.rightwing._z();
+      return Math.min(z1, z2, z3);
+    },
+    wing: function(y) {
+      this.wY = y;
+    }
+  }
+);
+Bird.Tri = Bird.def(
+  function(p1, p2, p3) {
+    this.mainv = [p1.copy(), p2.copy(), p3.copy()];
+    this.Vtxs = [p1.copy(), p2.copy(), p3.copy()];
+    this.bv = new Bird.Vtr(0.5, 0.5, 0.8);
+  }, {
+    draw: function() {
+      var v1 = [this.Vtxs[0].Pt().x, this.Vtxs[0].Pt().y];
+      var v2 = [this.Vtxs[1].Pt().x, this.Vtxs[1].Pt().y];
+      var v3 = [this.Vtxs[2].Pt().x, this.Vtxs[2].Pt().y];
+      var col = this.col();
+      Bird.$.fillStyle = col;
+      Bird.$.strokeStyle = col;
+      Bird.$.lineWidth = 0.1;
+      Bird.$.beginPath();
+      Bird.$.moveTo(v1[0], v1[1]);
+      Bird.$.lineTo(v2[0], v2[1]);
+      Bird.$.lineTo(v3[0], v3[1]);
+      Bird.$.lineTo(v1[0], v1[1]);
+      Bird.$.closePath();
+      Bird.$.fill();
+      Bird.$.stroke();
+    },
+    rotX: function(a) {
+      var ang = a;
+      this.Vtxs.forEach(
+        function(e, i, a) {
+          Bird.Matrix.rotX(e, ang);
+        }
+      );
+    },
+    rotY: function(a) {
+      var ang = a;
+      this.Vtxs.forEach(
+        function(e, i, a) {
+          Bird.Matrix.rotY(e, ang);
+        }
+      );
+    },
+    rotZ: function(a) {
+      var ang = a;
+      this.Vtxs.forEach(
+        function(e, i, a) {
+          Bird.Matrix.rotZ(e, ang);
+        }
+      );
+    },
+    trans: function(s) {
+      var trans = s;
+      this.Vtxs.forEach(
+        function(e, i, a) {
+          Bird.Matrix.trans(e, [trans.x, trans.y, trans.z]);
+        }
+      );
+    },
+    vtx: function(idx) {
+      for (var i = 0; i < 3; i++) {
+        var x = this.mainv[i].x;
+        var y = this.mainv[i].y;
+        var z = this.mainv[i].z;
+        this.Vtxs[i].x = x;
+        this.Vtxs[i].y = y;
+        this.Vtxs[i].z = z;
+      }
+    },
+    wingY: function(y) {
+      this.Vtxs[0].y = y;
+    },
+    _z: function() {
+      return Math.min(this.Vtxs[0].z, this.Vtxs[1].z, this.Vtxs[2].z);
+    },
+    col: function() {
+      var e = 0.3,
+          f = 0.3,
+          g = 0.7;
+      var bw = new Bird.Vtr(1, 1, 1);
+      var n = this.norm();
+      var x = this.Vtxs[0].copy();
+      var v = x.sub(Bird.V);
+      v.level();
+      x = this.Vtxs[0].copy();
+      var l = x.sub(Bird.L);
+      l.level();
+      var p = l.p(n);
+      var x1 = n.copy();
+      x1.scale(p);
+      x1.scale(2);
+      var r = l.copy();
+      r.sub(x1);
+      x1.scale(-1);
+      p = Math.max(x1.p(l), 0);
+      var col = this.bv.copy();
+      col.scale(p);
+      col.scale(col, e);
+      x1 = col.copy();
+      var x2 = r.copy();
+      x2.scale(-1);
+      p = Math.pow(Math.max(x2.p(v)), 20);
+      x2 = bw.copy();
+      x2.scale(p * f);
+      var x3 = this.bv.copy();
+      x3.scale(g);
+      x1.add(x2);
+      x1.add(x3);
+      var _r = Math.floor(x1.x * 255);
+      var _g = Math.floor(x1.y * 255);
+      var _b = Math.floor(x1.z * 255);
+      return 'rgb(' + _r + ',' + _g + ',' + _b + ')';
+    },
+    norm: function() {
+      var v1 = this.Vtxs[0];
+      var v2 = this.Vtxs[1];
+      var v3 = this.Vtxs[2];
+      v3.sub(v2);
+      v1.sub(v3);
+      v3.cross(v1);
+      v3.level();
+      return v3;
+    }
+  }
+);
+Bird.Vtr = Bird.def(
+  function(x, y, z) {
+    this.x = x || 0;
+    this.y = y || 0;
+    this.z = z || 0;
+    this.fl = 1000;
+  }, {
+    Pt: function() {
+      var zsc = this.fl + this.z;
+      var scale = this.fl / zsc;
+      var x = this.x * scale;
+      var y = this.y * scale;
+      return {
+        x: x,
+        y: y,
+        scale: scale
+      };
+    },
+    set: function(x, y, z) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      return this;
+    },
+    len: function() {
+      return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+    },
+    add: function(v, w) {
+
+      this.x += v.x;
+      this.y += v.y;
+      this.z += v.z;
+      return this;
+    },
+    sub: function(v, w) {
+
+      this.x -= v.x;
+      this.y -= v.y;
+      this.z -= v.z;
+      return this;
+    },
+    subv: function(a, b) {
+      this.x = a.x - b.x;
+      this.y = a.y - b.y;
+      this.z = a.z - b.z;
+      return this;
+    },
+    scale: function(upd) {
+      this.x *= upd;
+      this.y *= upd;
+      this.z *= upd;
+      return this;
+    },
+    lowscale: function(upd) {
+      if (upd !== 0) {
+        var inv = 1 / upd;
+        this.x *= inv;
+        this.y *= inv;
+        this.z *= inv;
+      } else {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+      }
+      return this;
+    },
+    copy: function(v) {
+      this.x = v.x;
+      this.y = v.y;
+      this.z = v.z;
+      return this;
+    },
+    dst: function(v) {
+      return Math.sqrt(this.dsq(v));
+    },
+    dsq: function(v) {
+      var dx = this.x - v.x;
+      var dy = this.y - v.y;
+      var dz = this.z - v.z;
+      return dx * dx + dy * dy + dz * dz;
+    },
+    cross: function(v, w) {
+      var x = this.x,
+        y = this.y,
+        z = this.z;
+      this.x = y * v.z - z * v.y;
+      this.y = z * v.x - x * v.z;
+      this.z = x * v.y - y * v.x;
+      return this;
+    },
+    p: function(v) {
+      return this.x * v.x + this.y * v.y + this.z * v.z;
+    },
+    level: function() {
+      return this.lowscale(this.len());
+    },
+    copy: function() {
+      return new Bird.Vtr(this.x, this.y, this.z);
+    }
+  }
+);
+Bird.Matrix = {
+  rotX: function(pt, angX) {
+    var pos = [pt.x, pt.y, pt.z];
+    var asin = Math.sin(angX);
+    var acos = Math.cos(angX);
+    var xrot = [];
+    xrot[0] = [1, 0, 0];
+    xrot[1] = [0, acos, asin];
+    xrot[2] = [0, -asin, acos];
+    var calc = this.mm(pos, xrot);
+    pt.x = calc[0];
+    pt.y = calc[1];
+    pt.z = calc[2];
+  },
+  rotY: function(pt, angY) {
+    var pos = [pt.x, pt.y, pt.z];
+    var asin = Math.sin(angY);
+    var acos = Math.cos(angY);
+    var yrot = [];
+    yrot[0] = [acos, 0, asin];
+    yrot[1] = [0, 1, 0];
+    yrot[2] = [-asin, 0, acos];
+    var calc = this.mm(pos, yrot);
+    pt.x = calc[0];
+    pt.y = calc[1];
+    pt.z = calc[2];
+  },
+  rotZ: function(pt, angZ) {
+    var pos = [pt.x, pt.y, pt.z];
+    var asin = Math.sin(angZ);
+    var acos = Math.cos(angZ);
+    var yrot = [];
+    yrot[0] = [acos, asin, 0];
+    yrot[1] = [-asin, acos, 0];
+    yrot[2] = [0, 0, 1];
+    var calc = this.mm(pos, yrot);
+    pt.x = calc[0];
+    pt.y = calc[1];
+    pt.z = calc[2];
+  },
+  trans: function(pt, s) {
+    pt.x += s[0];
+    pt.y += s[1];
+    pt.z += s[2];
+  },
+  scale: function(pt, s) {
+    pt.x *= s[0];
+    pt.y *= s[1];
+    pt.z *= s[2];
+  },
+  mm: function(m1, m2) {
+    var calc = [];
+    calc[0] = m1[0] * m2[0][0] + m1[1] * m2[1][0] + m1[2] * m2[2][0];
+    calc[1] = m1[0] * m2[0][1] + m1[1] * m2[1][1] + m1[2] * m2[2][1];
+    calc[2] = m1[0] * m2[0][2] + m1[1] * m2[1][2] + m1[2] * m2[2][2];
+    return calc;
+  }
+}
+
+function draw() {
+  var c = document.getElementById('canv');
+  Bird.$ = c.getContext("2d");
+  Bird.canv = {
+    w: c.width = window.innerWidth,
+    h: c.height = window.innerHeight
+  };
+  Bird.L = new Bird.Vtr(0, 2000, 5000);
+  Bird.V = new Bird.Vtr(0, 0, 5000);
+  var birds = [];
+  var b = [];
+  for (var i = 0; i < 100; i++) {
+    _b = b[i] = new Bird.obj();
+    _b.pos.x = Math.random() * 800 - 400;
+    _b.pos.y = Math.random() * 800 - 400;
+    _b.pos.z = Math.random() * 800 - 400;
+    _b.vel.x = Math.random() * 2 - 1;
+    _b.vel.y = Math.random() * 2 - 1;
+    _b.vel.z = Math.random() * 2 - 1;
+    _b._coll(true);
+    _b.param(400, 400, 800);
+    bird = birds[i] = new Bird.Build();
+    bird.phase = Math.floor(Math.random() * 62.83);
+    bird.pos = b[i].pos;
+  }
+
+  run();
+
+  function run() {
+    window.requestAnimationFrame(run);
+    draw();
+  }
+
+  function draw() {
+    Bird.$.setTransform(1, 0, 0, 1, 0, 0);
+    Bird.$.translate(Bird.canv.w / 2, Bird.canv.h / 2);
+    Bird.$.clearRect(-Bird.canv.w / 2, -Bird.canv.h / 2, Bird.canv.w, Bird.canv.h);
+    Bird.$.scale(1, -1);
+    var arr = [];
+    b.forEach(function(e, i, a) {
+      var _b = b[i];
+      _b.run(b);
+      var bird = birds[i];
+      bird.rot.y = Math.atan2(-_b.vel.z, _b.vel.x);
+      bird.rot.z = Math.asin(_b.vel.y / _b.vel.len());
+      bird.phase = (bird.phase + (Math.max(0, bird.rot.z) + 0.1)) % 62.83;
+      bird.wing(Math.sin(bird.phase) * 5);
+      bird.matrix();
+      arr.push({
+        z: bird.zpos(),
+        o: bird
+      });
+    });
+    arr.sort(function(a, b) {
+      return a.z < b.z ? -1 : a.z > b.z ? 1 : 0;
+    });
+    arr.forEach(function(e, i, a) {
+      e.o.draw();
+    });
+  }
+};
+draw();
+window.addEventListener('resize',function(){
+   if(c.width!==window.innerWidth && c.height!==window.innerHeight){
+     Bird.canv = {
+      w: c.width = window.innerWidth,
+      h: c.height = window.innerHeight
+    };
+   }
+});
+    </script>
+
+  
+
+
+
+
+ 
+</body></html>
