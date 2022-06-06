@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <title>Particles</title>
+  
+  
+  <link rel="stylesheet" href="./fun8_files/bebas.css">
+  
+<style>
+body {
+  padding: 40px 0;
+  font-family: "bebas", sans-serif;
+  background-color: #fff;
+}
+body .textcontainer {
+  padding: 40px 0;
+  text-align: center;
+}
+body .particletext {
+  text-align: center;
+  font-size: 48px;
+  position: relative;
+}
+body .particletext.bubbles > .particle {
+  opacity: 0;
+  position: absolute;
+  background-color: rgba(33, 150, 243, 0.5);
+  -webkit-animation: bubbles 3s ease-in infinite;
+          animation: bubbles 3s ease-in infinite;
+  border-radius: 100%;
+}
+body .particletext.hearts > .particle {
+  opacity: 0;
+  position: absolute;
+  background-color: #cc2a5d;
+  -webkit-animation: hearts 3s ease-in infinite;
+          animation: hearts 3s ease-in infinite;
+}
+body .particletext.hearts > .particle:before, body .particletext.hearts > .particle:after {
+  position: absolute;
+  content: "";
+  border-radius: 100px;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: #cc2a5d;
+}
+body .particletext.hearts > .particle:before {
+  transform: translateX(-50%);
+}
+body .particletext.hearts > .particle:after {
+  transform: translateY(-50%);
+}
+body .particletext.lines > .particle {
+  position: absolute;
+  background-color: rgba(244, 67, 54, 0.5);
+  -webkit-animation: lines 3s linear infinite;
+          animation: lines 3s linear infinite;
+}
+body .particletext.confetti > .particle {
+  opacity: 0;
+  position: absolute;
+  -webkit-animation: confetti 3s ease-in infinite;
+          animation: confetti 3s ease-in infinite;
+}
+body .particletext.confetti > .particle.c1 {
+  background-color: rgba(76, 175, 80, 0.5);
+}
+body .particletext.confetti > .particle.c2 {
+  background-color: rgba(156, 39, 176, 0.5);
+}
+body .particletext.fire > .particle {
+  position: absolute;
+  background-color: rgba(255, 193, 7, 0.5);
+  border-radius: 40px;
+  border-top-right-radius: 0px;
+  -webkit-animation: fires 0.8s linear infinite;
+          animation: fires 0.8s linear infinite;
+  transform: rotate(-45deg);
+  opacity: 0;
+}
+body .particletext.fire > .particle:before {
+  position: absolute;
+  content: "";
+  top: 60%;
+  left: 40%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  height: 50%;
+  border-radius: 40px;
+  border-top-right-radius: 0px;
+  background-color: rgba(251, 140, 0, 0.5);
+}
+body .particletext.sunbeams > .particle {
+  position: absolute;
+  background-color: rgba(253, 216, 53, 0.5);
+  -webkit-animation: sunbeams 3s linear infinite;
+          animation: sunbeams 3s linear infinite;
+}
+
+@-webkit-keyframes bubbles {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: translate(0, -20%);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, -1000%);
+  }
+}
+
+@keyframes bubbles {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: translate(0, -20%);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, -1000%);
+  }
+}
+@-webkit-keyframes hearts {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0%) rotate(45deg);
+  }
+  20% {
+    opacity: 0.8;
+    transform: translate(0, -20%) rotate(45deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, -1000%) rotate(45deg);
+  }
+}
+@keyframes hearts {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0%) rotate(45deg);
+  }
+  20% {
+    opacity: 0.8;
+    transform: translate(0, -20%) rotate(45deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, -1000%) rotate(45deg);
+  }
+}
+@-webkit-keyframes lines {
+  0%, 50%, 100% {
+    transform: translateY(0%);
+  }
+  25% {
+    transform: translateY(100%);
+  }
+  75% {
+    transform: translateY(-100%);
+  }
+}
+@keyframes lines {
+  0%, 50%, 100% {
+    transform: translateY(0%);
+  }
+  25% {
+    transform: translateY(100%);
+  }
+  75% {
+    transform: translateY(-100%);
+  }
+}
+@-webkit-keyframes confetti {
+  0% {
+    opacity: 0;
+    transform: translateY(0%) rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  35% {
+    transform: translateY(-800%) rotate(270deg);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(2000%) rotate(1440deg);
+  }
+}
+@keyframes confetti {
+  0% {
+    opacity: 0;
+    transform: translateY(0%) rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  35% {
+    transform: translateY(-800%) rotate(270deg);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(2000%) rotate(1440deg);
+  }
+}
+@-webkit-keyframes fires {
+  0% {
+    transform: rotate(-70deg) translateY(0%);
+  }
+  25% {
+    transform: rotate(-20deg) translateY(-5%);
+    opacity: 1;
+  }
+  50% {
+    transform: rotate(-70deg) translateY(-10%);
+  }
+  75% {
+    transform: rotate(-20deg) translateY(-20%);
+  }
+  100% {
+    transform: rotate(-70deg) translateY(-40%);
+    opacity: 1;
+  }
+}
+@keyframes fires {
+  0% {
+    transform: rotate(-70deg) translateY(0%);
+  }
+  25% {
+    transform: rotate(-20deg) translateY(-5%);
+    opacity: 1;
+  }
+  50% {
+    transform: rotate(-70deg) translateY(-10%);
+  }
+  75% {
+    transform: rotate(-20deg) translateY(-20%);
+  }
+  100% {
+    transform: rotate(-70deg) translateY(-40%);
+    opacity: 1;
+  }
+}
+@-webkit-keyframes sunbeams {
+  0% {
+    transform: translateY(40%) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-40%) rotate(180deg);
+  }
+  100% {
+    transform: translateY(40%) rotate(360deg);
+  }
+  0%, 14%, 17%, 43%, 53%, 71%, 80%, 94%, 100% {
+    opacity: 0;
+  }
+  6%, 15%, 24%, 28%, 48%, 55%, 78%, 82%, 99% {
+    opacity: 1;
+  }
+}
+@keyframes sunbeams {
+  0% {
+    transform: translateY(40%) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-40%) rotate(180deg);
+  }
+  100% {
+    transform: translateY(40%) rotate(360deg);
+  }
+  0%, 14%, 17%, 43%, 53%, 71%, 80%, 94%, 100% {
+    opacity: 0;
+  }
+  6%, 15%, 24%, 28%, 48%, 55%, 78%, 82%, 99% {
+    opacity: 1;
+  }
+}
+</style>
+
+  
+  
+  
+  
+
+</head>
+
+<body translate="no" class="none">
+  <div class="textcontainer">
+   <span class="particletext bubbles">Bubbles<span class="particle" style="top:32%; left:9%;width:4.9px; height:4.9px;animation-delay: 2.7s;"></span><span class="particle" style="top:36%; left:51%;width:7.7px; height:7.7px;animation-delay: 1.5s;"></span><span class="particle" style="top:26%; left:73%;width:4.9px; height:4.9px;animation-delay: 2.8s;"></span><span class="particle" style="top:26%; left:16%;width:6.7px; height:6.7px;animation-delay: 2.4s;"></span><span class="particle" style="top:37%; left:75%;width:4.2px; height:4.2px;animation-delay: 2.6s;"></span><span class="particle" style="top:68%; left:12%;width:7.2px; height:7.2px;animation-delay: 2.9s;"></span><span class="particle" style="top:33%; left:68%;width:4.4px; height:4.4px;animation-delay: 1.3s;"></span><span class="particle" style="top:62%; left:62%;width:6.5px; height:6.5px;animation-delay: 0.4s;"></span><span class="particle" style="top:27%; left:28%;width:4.3px; height:4.3px;animation-delay: 3s;"></span><span class="particle" style="top:74%; left:41%;width:5.9px; height:5.9px;animation-delay: 0.1s;"></span><span class="particle" style="top:27%; left:63%;width:5.7px; height:5.7px;animation-delay: 2.1s;"></span><span class="particle" style="top:45%; left:0%;width:5.2px; height:5.2px;animation-delay: 2.3s;"></span><span class="particle" style="top:28%; left:18%;width:7.7px; height:7.7px;animation-delay: 1.6s;"></span><span class="particle" style="top:64%; left:0%;width:6px; height:6px;animation-delay: 0.1s;"></span><span class="particle" style="top:41%; left:12%;width:7.4px; height:7.4px;animation-delay: 0.1s;"></span><span class="particle" style="top:73%; left:29%;width:4.2px; height:4.2px;animation-delay: 3s;"></span><span class="particle" style="top:55%; left:45%;width:7px; height:7px;animation-delay: 1.6s;"></span><span class="particle" style="top:65%; left:42%;width:6.8px; height:6.8px;animation-delay: 2.5s;"></span><span class="particle" style="top:71%; left:76%;width:7px; height:7px;animation-delay: 3s;"></span><span class="particle" style="top:74%; left:7%;width:7.3px; height:7.3px;animation-delay: 2.3s;"></span><span class="particle" style="top:28%; left:63%;width:5.2px; height:5.2px;animation-delay: 2.4s;"></span><span class="particle" style="top:74%; left:70%;width:4.2px; height:4.2px;animation-delay: 1.1s;"></span><span class="particle" style="top:61%; left:6%;width:4.9px; height:4.9px;animation-delay: 2.2s;"></span><span class="particle" style="top:47%; left:66%;width:6.4px; height:6.4px;animation-delay: 1.8s;"></span><span class="particle" style="top:28%; left:4%;width:7.3px; height:7.3px;animation-delay: 2.4s;"></span><span class="particle" style="top:29%; left:83%;width:4.9px; height:4.9px;animation-delay: 1.4s;"></span><span class="particle" style="top:39%; left:61%;width:4.5px; height:4.5px;animation-delay: 1.2s;"></span><span class="particle" style="top:45%; left:23%;width:4.9px; height:4.9px;animation-delay: 1s;"></span><span class="particle" style="top:43%; left:66%;width:4.5px; height:4.5px;animation-delay: 0.2s;"></span><span class="particle" style="top:65%; left:0%;width:7.1px; height:7.1px;animation-delay: 1.8s;"></span><span class="particle" style="top:60%; left:92%;width:6.4px; height:6.4px;animation-delay: 1.6s;"></span><span class="particle" style="top:43%; left:90%;width:7.4px; height:7.4px;animation-delay: 1.5s;"></span><span class="particle" style="top:43%; left:81%;width:4.2px; height:4.2px;animation-delay: 1.7s;"></span><span class="particle" style="top:27%; left:12%;width:6.1px; height:6.1px;animation-delay: 3s;"></span><span class="particle" style="top:69%; left:27%;width:5.8px; height:5.8px;animation-delay: 2.9s;"></span></span>
+</div>
+
+<div class="textcontainer">
+   <span class="particletext confetti">Confetti<span class="particle c2" style="top:39%; left:56%;width:7px; height:4px;animation-delay: 1.4s;"></span><span class="particle c1" style="top:41%; left:62%;width:7px; height:3px;animation-delay: 0.6s;"></span><span class="particle c1" style="top:31%; left:93%;width:6px; height:3px;animation-delay: 0.3s;"></span><span class="particle c2" style="top:24%; left:97%;width:7px; height:3px;animation-delay: 2.2s;"></span><span class="particle c2" style="top:49%; left:12%;width:7px; height:3px;animation-delay: 2.9s;"></span><span class="particle c2" style="top:21%; left:62%;width:6px; height:3px;animation-delay: 2.4s;"></span><span class="particle c2" style="top:21%; left:58%;width:6px; height:3px;animation-delay: 0s;"></span><span class="particle c2" style="top:36%; left:23%;width:8px; height:4px;animation-delay: 0.8s;"></span><span class="particle c1" style="top:39%; left:98%;width:6px; height:3px;animation-delay: 1.8s;"></span><span class="particle c2" style="top:37%; left:88%;width:6px; height:3px;animation-delay: 0.8s;"></span><span class="particle c2" style="top:32%; left:20%;width:8px; height:3px;animation-delay: 0.9s;"></span><span class="particle c2" style="top:43%; left:93%;width:6px; height:3px;animation-delay: 1.3s;"></span><span class="particle c1" style="top:28%; left:11%;width:8px; height:4px;animation-delay: 1s;"></span><span class="particle c2" style="top:33%; left:26%;width:7px; height:3px;animation-delay: 2.9s;"></span><span class="particle c2" style="top:40%; left:36%;width:6px; height:4px;animation-delay: 2.2s;"></span><span class="particle c2" style="top:10%; left:59%;width:8px; height:4px;animation-delay: 2.6s;"></span><span class="particle c2" style="top:24%; left:62%;width:6px; height:3px;animation-delay: 1.6s;"></span><span class="particle c2" style="top:32%; left:80%;width:7px; height:4px;animation-delay: 1.9s;"></span><span class="particle c1" style="top:39%; left:10%;width:7px; height:3px;animation-delay: 1.8s;"></span><span class="particle c2" style="top:43%; left:3%;width:8px; height:4px;animation-delay: 3s;"></span><span class="particle c2" style="top:27%; left:52%;width:7px; height:3px;animation-delay: 0.1s;"></span><span class="particle c2" style="top:11%; left:17%;width:7px; height:3px;animation-delay: 1.1s;"></span><span class="particle c2" style="top:13%; left:52%;width:7px; height:4px;animation-delay: 0.1s;"></span><span class="particle c2" style="top:42%; left:63%;width:6px; height:3px;animation-delay: 0.6s;"></span><span class="particle c1" style="top:28%; left:99%;width:7px; height:4px;animation-delay: 0.6s;"></span><span class="particle c1" style="top:14%; left:45%;width:8px; height:3px;animation-delay: 0.7s;"></span><span class="particle c1" style="top:11%; left:4%;width:7px; height:3px;animation-delay: 2.6s;"></span><span class="particle c1" style="top:27%; left:60%;width:8px; height:3px;animation-delay: 0.7s;"></span><span class="particle c1" style="top:20%; left:87%;width:8px; height:4px;animation-delay: 2.5s;"></span><span class="particle c1" style="top:39%; left:10%;width:7px; height:3px;animation-delay: 2.1s;"></span><span class="particle c2" style="top:25%; left:24%;width:6px; height:4px;animation-delay: 0.6s;"></span><span class="particle c2" style="top:33%; left:65%;width:6px; height:4px;animation-delay: 2.9s;"></span><span class="particle c2" style="top:24%; left:4%;width:8px; height:4px;animation-delay: 2s;"></span><span class="particle c1" style="top:17%; left:60%;width:7px; height:3px;animation-delay: 0.1s;"></span></span>
+</div>
+
+<div class="textcontainer">
+   <span class="particletext hearts">Hearts<span class="particle" style="top:71%; left:4%;width:7.4px; height:7.4px;animation-delay: 2.2s;"></span><span class="particle" style="top:68%; left:95%;width:8.6px; height:8.6px;animation-delay: 2.1s;"></span><span class="particle" style="top:48%; left:49%;width:8.3px; height:8.3px;animation-delay: 0s;"></span><span class="particle" style="top:48%; left:77%;width:7px; height:7px;animation-delay: 1.9s;"></span><span class="particle" style="top:44%; left:24%;width:11.6px; height:11.6px;animation-delay: 0.3s;"></span><span class="particle" style="top:61%; left:81%;width:10.5px; height:10.5px;animation-delay: 1.9s;"></span><span class="particle" style="top:73%; left:61%;width:8.4px; height:8.4px;animation-delay: 1.1s;"></span><span class="particle" style="top:56%; left:19%;width:8px; height:8px;animation-delay: 0s;"></span><span class="particle" style="top:75%; left:7%;width:6.9px; height:6.9px;animation-delay: 2.6s;"></span><span class="particle" style="top:25%; left:59%;width:6.6px; height:6.6px;animation-delay: 1.6s;"></span><span class="particle" style="top:58%; left:1%;width:9.5px; height:9.5px;animation-delay: 0.5s;"></span><span class="particle" style="top:38%; left:70%;width:6.5px; height:6.5px;animation-delay: 0.3s;"></span><span class="particle" style="top:60%; left:6%;width:11.8px; height:11.8px;animation-delay: 1.1s;"></span><span class="particle" style="top:24%; left:43%;width:7.1px; height:7.1px;animation-delay: 0.9s;"></span><span class="particle" style="top:26%; left:5%;width:11px; height:11px;animation-delay: 1.9s;"></span></span>
+</div>
+
+<div class="textcontainer">
+   <span class="particletext fire">Fire<span class="particle" style="top:48%; left:2%;width:12px; height:12px;animation-delay: 1.5s;"></span><span class="particle" style="top:70%; left:97%;width:10px; height:10px;animation-delay: 1.1s;"></span><span class="particle" style="top:47%; left:34%;width:11px; height:11px;animation-delay: 1s;"></span><span class="particle" style="top:44%; left:5%;width:9px; height:9px;animation-delay: 0.7s;"></span><span class="particle" style="top:55%; left:30%;width:9px; height:9px;animation-delay: 0.3s;"></span><span class="particle" style="top:58%; left:91%;width:9px; height:9px;animation-delay: 1s;"></span><span class="particle" style="top:53%; left:71%;width:8px; height:8px;animation-delay: 1.4s;"></span><span class="particle" style="top:54%; left:16%;width:8px; height:8px;animation-delay: 1.8s;"></span><span class="particle" style="top:45%; left:20%;width:8px; height:8px;animation-delay: 1.5s;"></span><span class="particle" style="top:42%; left:59%;width:9px; height:9px;animation-delay: 1.6s;"></span><span class="particle" style="top:59%; left:87%;width:9px; height:9px;animation-delay: 1.6s;"></span><span class="particle" style="top:46%; left:29%;width:11px; height:11px;animation-delay: 0.7s;"></span><span class="particle" style="top:65%; left:47%;width:9px; height:9px;animation-delay: 1s;"></span><span class="particle" style="top:48%; left:5%;width:10px; height:10px;animation-delay: 0.8s;"></span><span class="particle" style="top:60%; left:91%;width:10px; height:10px;animation-delay: 1.9s;"></span><span class="particle" style="top:69%; left:6%;width:8px; height:8px;animation-delay: 1.9s;"></span><span class="particle" style="top:68%; left:45%;width:10px; height:10px;animation-delay: 0.8s;"></span><span class="particle" style="top:65%; left:52%;width:8px; height:8px;animation-delay: 0.1s;"></span><span class="particle" style="top:67%; left:89%;width:9px; height:9px;animation-delay: 0.5s;"></span><span class="particle" style="top:45%; left:30%;width:11px; height:11px;animation-delay: 1.1s;"></span><span class="particle" style="top:60%; left:85%;width:10px; height:10px;animation-delay: 0s;"></span><span class="particle" style="top:70%; left:81%;width:8px; height:8px;animation-delay: 0.3s;"></span><span class="particle" style="top:55%; left:99%;width:12px; height:12px;animation-delay: 1.4s;"></span><span class="particle" style="top:59%; left:85%;width:11px; height:11px;animation-delay: 1.3s;"></span><span class="particle" style="top:70%; left:84%;width:12px; height:12px;animation-delay: 1.9s;"></span><span class="particle" style="top:60%; left:-3%;width:8px; height:8px;animation-delay: 0.3s;"></span><span class="particle" style="top:42%; left:11%;width:12px; height:12px;animation-delay: 1.9s;"></span><span class="particle" style="top:43%; left:54%;width:12px; height:12px;animation-delay: 1.4s;"></span><span class="particle" style="top:57%; left:22%;width:11px; height:11px;animation-delay: 0s;"></span><span class="particle" style="top:66%; left:78%;width:10px; height:10px;animation-delay: 0.9s;"></span><span class="particle" style="top:53%; left:68%;width:10px; height:10px;animation-delay: 1.3s;"></span><span class="particle" style="top:43%; left:1%;width:8px; height:8px;animation-delay: 1.8s;"></span><span class="particle" style="top:43%; left:-4%;width:9px; height:9px;animation-delay: 0.2s;"></span><span class="particle" style="top:67%; left:1%;width:11px; height:11px;animation-delay: 2s;"></span></span>
+</div>
+
+
+<div class="textcontainer">
+   <span class="particletext lines">Lines<span class="particle" style="top:-27%; left:42%;width:2px; height:71%;animation-delay: -2.7s;"></span><span class="particle" style="top:4%; left:17%;width:2px; height:63%;animation-delay: -1.3s;"></span><span class="particle" style="top:26%; left:-3%;width:1px; height:52%;animation-delay: -0.1s;"></span><span class="particle" style="top:-5%; left:72%;width:1px; height:41%;animation-delay: -1.3s;"></span><span class="particle" style="top:4%; left:28%;width:3px; height:30%;animation-delay: -0.5s;"></span><span class="particle" style="top:17%; left:67%;width:3px; height:71%;animation-delay: -1.5s;"></span><span class="particle" style="top:6%; left:14%;width:2px; height:20%;animation-delay: -0.6s;"></span><span class="particle" style="top:-8%; left:-8%;width:1px; height:51%;animation-delay: -0.4s;"></span><span class="particle" style="top:-22%; left:33%;width:1px; height:57%;animation-delay: -2.5s;"></span><span class="particle" style="top:18%; left:25%;width:3px; height:73%;animation-delay: -1.3s;"></span><span class="particle" style="top:-29%; left:61%;width:3px; height:29%;animation-delay: -0.4s;"></span><span class="particle" style="top:-14%; left:4%;width:2px; height:36%;animation-delay: -1.1s;"></span><span class="particle" style="top:-19%; left:42%;width:3px; height:31%;animation-delay: -1.2s;"></span><span class="particle" style="top:4%; left:28%;width:1px; height:63%;animation-delay: -0.4s;"></span><span class="particle" style="top:9%; left:101%;width:3px; height:54%;animation-delay: -0.9s;"></span><span class="particle" style="top:-1%; left:3%;width:3px; height:21%;animation-delay: -1.7s;"></span><span class="particle" style="top:17%; left:37%;width:3px; height:65%;animation-delay: -0.6s;"></span><span class="particle" style="top:-6%; left:54%;width:1px; height:30%;animation-delay: -2.8s;"></span><span class="particle" style="top:15%; left:58%;width:2px; height:27%;animation-delay: -1.6s;"></span><span class="particle" style="top:-28%; left:45%;width:2px; height:78%;animation-delay: -2.7s;"></span><span class="particle" style="top:-10%; left:84%;width:1px; height:28%;animation-delay: -0.2s;"></span><span class="particle" style="top:-7%; left:40%;width:3px; height:33%;animation-delay: -0.6s;"></span><span class="particle" style="top:9%; left:46%;width:3px; height:70%;animation-delay: -1.7s;"></span><span class="particle" style="top:29%; left:43%;width:1px; height:52%;animation-delay: -1s;"></span></span>
+</div>
+<!--<div class="textcontainer">
+   <span class="particletext sunbeams">Beams?</span>
+</div>-->
+  
+  <script src="./fun8_files/a8e37caf2a04602ea5815e5acedab458.js.download"></script>
+<script src="./fun8_files/jquery.min.js.download"></script>
+<script src="./fun8_files/2677821722cd9e02c2c882a17c5b2072.js.download"></script>
+<script src="./fun8_files/0a1bedbb8ca05b9afd329264fca7b921.js.download"></script>
+      <script id="rendered-js">
+function initparticles() {
+   bubbles();
+   hearts();
+   lines();
+   confetti();
+   fire();
+   sunbeams();
+}
+
+/*The measurements are ... whack (so to say), for more general text usage I would generate different sized particles for the size of text; consider this pen a POC*/
+
+function bubbles() {
+   $.each($(".particletext.bubbles"), function(){
+      var bubblecount = ($(this).width()/50)*10;
+      for(var i = 0; i <= bubblecount; i++) {
+         var size = ($.rnd(40,80)/10);
+         $(this).append('<span class="particle" style="top:' + $.rnd(20,80) + '%; left:' + $.rnd(0,95) + '%;width:' + size + 'px; height:' + size + 'px;animation-delay: ' + ($.rnd(0,30)/10) + 's;"></span>');
+      }
+   });
+}
+
+function hearts() {
+   $.each($(".particletext.hearts"), function(){
+      var heartcount = ($(this).width()/50)*5;
+      for(var i = 0; i <= heartcount; i++) {
+         var size = ($.rnd(60,120)/10);
+         $(this).append('<span class="particle" style="top:' + $.rnd(20,80) + '%; left:' + $.rnd(0,95) + '%;width:' + size + 'px; height:' + size + 'px;animation-delay: ' + ($.rnd(0,30)/10) + 's;"></span>');
+      }
+   });
+}
+
+function lines() {
+   $.each($(".particletext.lines"), function(){
+      var linecount = ($(this).width()/50)*10;
+      for(var i = 0; i <= linecount; i++) {
+         $(this).append('<span class="particle" style="top:' + $.rnd(-30,30) + '%; left:' + $.rnd(-10,110) + '%;width:' + $.rnd(1,3) + 'px; height:' + $.rnd(20,80) + '%;animation-delay: -' + ($.rnd(0,30)/10) + 's;"></span>');
+      }
+   });
+}
+
+function confetti() {
+   $.each($(".particletext.confetti"), function(){
+      var confetticount = ($(this).width()/50)*10;
+      for(var i = 0; i <= confetticount; i++) {
+         $(this).append('<span class="particle c' + $.rnd(1,2) + '" style="top:' + $.rnd(10,50) + '%; left:' + $.rnd(0,100) + '%;width:' + $.rnd(6,8) + 'px; height:' + $.rnd(3,4) + 'px;animation-delay: ' + ($.rnd(0,30)/10) + 's;"></span>');
+      }
+   });
+}
+
+function fire() {
+   $.each($(".particletext.fire"), function(){
+      var firecount = ($(this).width()/50)*20;
+      for(var i = 0; i <= firecount; i++) {
+         var size = $.rnd(8,12);
+         $(this).append('<span class="particle" style="top:' + $.rnd(40,70) + '%; left:' + $.rnd(-10,100) + '%;width:' + size + 'px; height:' + size + 'px;animation-delay: ' + ($.rnd(0,20)/10) + 's;"></span>');
+      }
+   });
+}
+
+function sunbeams() {
+   $.each($(".particletext.sunbeams"), function(){
+      var linecount = ($(this).width()/50)*10;
+      for(var i = 0; i <= linecount; i++) {
+         $(this).append('<span class="particle" style="top:' + $.rnd(-50,0) + '%; left:' + $.rnd(0,100) + '%;width:' + $.rnd(1,3) + 'px; height:' + $.rnd(80,160) + '%;animation-delay: -' + ($.rnd(0,30)/10) + 's;"></span>');
+      }
+   });
+}
+
+jQuery.rnd = function(m,n) {
+      m = parseInt(m);
+      n = parseInt(n);
+      return Math.floor( Math.random() * (n - m + 1) ) + m;
+}
+
+initparticles();
+    </script>
+
+  
+
+
+
+
+ 
+</body></html>
