@@ -5,17 +5,17 @@ function funButton(button, popup) {
 	var randomRange = 7
 
 	var sitesList = [
-    "https://funstuff.vercel.app/fun1.html",
-    "https://funstuff.vercel.app/fun2.html",
-    "https://funstuff.vercel.app/fun3.html",
-    "https://funstuff.vercel.app/fun4.html",
-    "https://funstuff.vercel.app/fun5.html",
-    "https://funstuff.vercel.app/fun6.html",
-    "https://funstuff.vercel.app/fun7.html",
-    "https://funstuff.vercel.app/fun8.html",
-    "https://funstuff.vercel.app/fun9.html",
-    "https://funstuff.vercel.app/fun10.html",
-    "https://longdogechallenge.com/",
+    		"https://funstuff.vercel.app/fun1.html",
+    		"https://funstuff.vercel.app/fun2.html",
+    		"https://funstuff.vercel.app/fun3.html",
+    		"https://funstuff.vercel.app/fun4.html",
+    		"https://funstuff.vercel.app/fun5.html",
+    		"https://funstuff.vercel.app/fun6.html",
+    		"https://funstuff.vercel.app/fun7.html",
+    		"https://funstuff.vercel.app/fun8.html",
+    		"https://funstuff.vercel.app/fun9.html",
+    		"https://funstuff.vercel.app/fun10.html",
+    		"https://longdogechallenge.com/",
 		"https://checkboxrace.com/",
 		"https://onesquareminesweeper.com/",
 		"http://heeeeeeeey.com/",
@@ -147,8 +147,6 @@ function funButton(button, popup) {
 
 	var onButtonClick = function () {
 		if (initialClick === false) {
-			// Change text from "TO A"
-			document.getElementById("joint").innerHTML = "TO ANOTHER"
 			initialClick = true
 		}
 
